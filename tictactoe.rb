@@ -136,13 +136,13 @@ while play == "Y"
       
       comp_move = "0"
   
-      #generate & validate computer move
+      #generate & validate computer move 
       while board_hsh.has_key?(comp_move) == false && board_hsh.has_value?(" ") == true
         comp_move = (1 + rand(9)).to_s
         if board_hsh.fetch(comp_move) == " "
           board_hsh[comp_move] = "O"
         else
-          comp_move = 0
+          comp_move = 0 #reset comp_move to zero for the next pass
         end
       end #end computer move validation
       
