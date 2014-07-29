@@ -54,14 +54,14 @@ end
 
 def winner_check(arry, contestant)
   win_combos_arr = [["1", "2", "3"], ["4", "5", "6"], ["4", "5", "6"],["7", "8", "9"], ["1", "4", "7"], ["2", "5", "8"], ["3", "6", "9"], ["1", "5", "9"], ["3", "5", "7"]]
-  
+
   champion = ""
-  
+
   win_combos_arr.each do |v|
       if (v & arry).count == 3
         champion =  "#{contestant}"
       end
-  end  
+  end
 
   if champion != contestant
          return ""
@@ -91,52 +91,52 @@ draw = 0
 while play == "Y"
 
   board_hsh = {"1" => " ", "2" => " ", "3" => " ", "4" => " ", "5" => " ", "6" => " ", "7" => " ", "8" => " ", "9" => " "}
-  
+
   player_arr = board_hsh.keys.select { |key| board_hsh[key] == "X"}
   comp_arr = board_hsh.keys.select { |key| board_hsh[key] == "O"}
-  
+
 
   winner = ""
-  
+
   # limit nbr of turns for nbr of board spaces
   turn_cnt = 5
 
   #begin turns
   catch :win do
     while  board_hsh.has_value?(" ") == true
-  
+
       create_board(board_hsh)
-  
-      # Request Player Move  
+
+      # Request Player Move
       player1_move = "0"
       #validate move
       while board_hsh.has_key?(player1_move) == false
-  
+
         say "Choose your space, (1 - 9)."
         player1_move = gets.chomp
-  
+
         if board_hsh.fetch(player1_move) == " "
           board_hsh[player1_move] = "X"
         else
           player1_move = 0
         end
-        
+
       end #end player move validation
-      
+
       #update players array
       player_arr = board_hsh.keys.select { |key| board_hsh[key] == "X"}
-      
+
       #check for winner
       winner = winner_check(player_arr, player_name)
-      
+
       #throw up the win to exit turns loop
       if winner != ""
         throw :win
       end
-      
+
       comp_move = "0"
-  
-      #generate & validate computer move 
+
+      #generate & validate computer move
       while board_hsh.has_key?(comp_move) == false && board_hsh.has_value?(" ") == true
         comp_move = (1 + rand(9)).to_s
         if board_hsh.fetch(comp_move) == " "
@@ -145,37 +145,40 @@ while play == "Y"
           comp_move = 0 #reset comp_move to zero for the next pass
         end
       end #end computer move validation
-      
+
       #update comps array
       comp_arr = board_hsh.keys.select { |key| board_hsh[key] == "O"}
-      
+
       # Check for winner
       winner = winner_check(comp_arr, "Computer")
-      
+
       #throw up the win to exit turns loop
       if winner != ""
         throw :win
       end
-      
+
     end #end of turns loop
   end #end of catch when there is a winner
-  
+
   #Create final board
   create_board(board_hsh)
 
   #Announce Winner
   case winner
     when "Computer"
+      loss += 1
       say "\n Better luck next time, #{winner} wins"
     when player_name
+      wins += 1
       say "\n Way to go #{player_name} you beat the computer!"
     else
+      draw += 1
       say "\ Tic Tac Toe should always end in a draw with two competent opponents."
   end
-  
+
   #Display player stats
   say "\n Your current record is #{wins} wins, #{loss} losses, and #{draw} draws."
-  
+
   #Ask to play again
   say "\n\nWould you lke to play again?(Y/N)"
   play = gets.chomp.upcase
