@@ -51,7 +51,18 @@ def crt_board(board_hsh)
   end #end create board loop
 end
 
-
+def winnercheck(ply_arry, contestant)
+  wincombos_arr = [["1", "2", "3"],["4", "5", "6"],["7", "8", "9"],["1", "4", "7"], ["2","5", "8"], ["3", "6", "9"], ["1", "5", "9"], ["3", "5", "7"]]
+  
+  wincombos_arr.each do |v|
+      if (v & ply_arry).count == 3
+        p v & ply_arry
+        return "#{contestant}"
+      else 
+        return ""
+      end
+    end  
+end
 
 # Establish player name
 say "Welcome to JZ's Super Happy Funtime Tic Tac Toe!!!"
@@ -65,65 +76,103 @@ gets
 
 play = "Y"
 
+wins = 0
+loss = 0
+draw = 0
 
 
 # Start game play loop
 while play == "Y"
 
   board_hsh = {"1" => " ", "2" => " ", "3" => " ", "4" => " ", "5" => " ", "6" => " ", "7" => " ", "8" => " ", "9" => " "}
+  
+  player_arr = board_hsh.keys.select { |key| board_hsh[key] == "X"}
+  comp_arr = board_hsh.keys.select { |key| board_hsh[key] == "O"}
+  
 
+  winner = ""
+  
   # limit nbr of turns for nbr of board spaces
   turn_cnt = 5
 
   #begin turns
-  while  board_hsh.has_value?(" ") == true
-
-    crt_board(board_hsh)
-
-    # Request Player Move
-
-    player1_mv = "0"
-    #validate move
-    while board_hsh.has_key?(player1_mv) == false
-
-      say "Choose your space, (1 - 9)."
-      player1_mv = gets.chomp
-
-      if board_hsh.fetch(player1_mv) == " "
-        board_hsh[player1_mv] = "X"
-      else
-        player1_mv = 0
+  catch :win do
+    while  board_hsh.has_value?(" ") == true
+  
+      crt_board(board_hsh)
+  
+      # Request Player Move
+  
+      player1_mv = "0"
+      #validate move
+      while board_hsh.has_key?(player1_mv) == false
+  
+        say "Choose your space, (1 - 9)."
+        player1_mv = gets.chomp
+  
+        if board_hsh.fetch(player1_mv) == " "
+          board_hsh[player1_mv] = "X"
+        else
+          player1_mv = 0
+        end
+        
+      end #end player move validation
+      
+      #update players array
+      player_arr = board_hsh.map{ |k,v| v=='X' ? k : nil }.compact
+      
+      #check for winner
+      winner = winnercheck(player_arr, player_nm)
+      
+      #throw up the win to exit turns loop
+      if winner != ""
+        throw :win
       end
-
-    end #end player move validation
-
-    comp_mv = "0"
-
-    #generate & validate computer move
-    while board_hsh.has_key?(comp_mv) == false && board_hsh.has_value?(" ") == true
-      comp_mv = (1 + rand(9)).to_s
-      if board_hsh.fetch(comp_mv) == " "
-        board_hsh[comp_mv] = "O"
-      else
-        comp_mv = 0
+      
+      comp_mv = "0"
+  
+      #generate & validate computer move
+      while board_hsh.has_key?(comp_mv) == false && board_hsh.has_value?(" ") == true
+        comp_mv = (1 + rand(9)).to_s
+        if board_hsh.fetch(comp_mv) == " "
+          board_hsh[comp_mv] = "O"
+        else
+          comp_mv = 0
+        end
+      end #end computer move validation
+      
+      #update comps array
+      comp_arr = board_hsh.keys.select { |key| board_hsh[key] == "O"}
+      
+      # Check for winner
+      winner = winnercheck(comp_arr, "Computer")
+      
+      #throw up the win to exit turns loop
+      if winner != ""
+        throw :win
       end
-    end #end computer move validation
-
-  end #end of turns loop
-
+      
+    end #end of turns loop
+  end #end of catch when there is a winner
   #Create final board
   crt_board(board_hsh)
 
-  #player wins
-  #1 2 3
-  #4 5 6
-  #7 8 9
-board_hsh.each {|k,v| puts k if v == "X"}
-
-  #computer wins
-
+  #Announce Winner
+  case winner
+    when "Computer"
+      say "\n Better luck next time, #{winner} wins"
+    when player_nm
+      say "\n Way to go #{player_nm} you beat the computer!"
+    else
+      say "\ Tic Tac Toe should always end in a draw with two competent opponents."
+  end
+  
+  #Display player stats
+  say "\n Your current record is #{wins} wins, #{loss} losses, and #{draw} draws."
+  
+  #Ask to play again
   say "\n\nWould you lke to play again?(Y/N)"
-  play = gets.chomp
+  play = gets.chomp.upcase
 
 
 end #end play loop
