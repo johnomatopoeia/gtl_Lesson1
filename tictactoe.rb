@@ -7,7 +7,7 @@ def say(msg)
 end
 
 
-def create_board(board_hash)
+def create_board(board_hsh)
 
   system "clear"
   system "cls"
@@ -52,17 +52,22 @@ def create_board(board_hash)
   end #end create board loop
 end
 
-def winner_check(ply_arry, contestant)
-  win_combos_arr = [["1", "2", "3"],["4", "5", "6"],["7", "8", "9"],["1", "4", "7"], ["2","5", "8"], ["3", "6", "9"], ["1", "5", "9"], ["3", "5", "7"]]
+def winner_check(arry, contestant)
+  win_combos_arr = [["1", "2", "3"], ["4", "5", "6"], ["4", "5", "6"],["7", "8", "9"], ["1", "4", "7"], ["2", "5", "8"], ["3", "6", "9"], ["1", "5", "9"], ["3", "5", "7"]]
+  
+  champion = ""
   
   win_combos_arr.each do |v|
-      if (v & ply_arry).count == 3
-        p v & ply_arry
-        return "#{contestant}"
-      else 
-        return ""
+      if (v & arry).count == 3
+        champion =  "#{contestant}"
       end
-    end  
+  end  
+
+  if champion != contestant
+         return ""
+  else
+        return champion
+  end
 end
 
 # Establish player name
@@ -119,7 +124,7 @@ while play == "Y"
       end #end player move validation
       
       #update players array
-      player_arr = board_hsh.map{ |k,v| v=='X' ? k : nil }.compact
+      player_arr = board_hsh.keys.select { |key| board_hsh[key] == "X"}
       
       #check for winner
       winner = winner_check(player_arr, player_name)
