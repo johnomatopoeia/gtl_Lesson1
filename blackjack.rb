@@ -44,16 +44,55 @@ end
 
 def show_table(bankroll, bet, dealer_cards,player_cards, player_name)
   puts "Bankroll = #{bankroll}  Bet = #{bet}"
-  puts "\n\n\n Dealer: \n #{dealer_cards}"
+  if dealer_cards.count > 2
+    puts "\n\n\n Dealer: \n #{dealer_cards}"
+  else 
+    puts "\n\n\n Dealer: \n [XXXXXXX, #{dealer_cards[1]}]"
+  end
   puts "\n\n\n #{player_name}: \n #{player_cards}"
-  
 end
+
+def hand_eval(cards, total)
+  ace_count = 0
+  
+  #iterate through cards to check for face cards and calculate total
+  cards.each do |c| 
+    if c.partition('-').first.to_i > 0
+      total += c.partition('-').first.to_i if c != 'A' 
+    else
+      if c.partition('-').first == 'A'
+        #checking for aces to evaluate after all other cards totaled b/c they can be 1 or 11
+        ace_count += 1   
+      else
+        total += 10
+      end
+    end
+  end
+  
+  #ace handling
+  if total > 10
+    total += ace_count
+  else
+    ace_count.times do
+      if total > 10
+        total += ace_count
+      else
+        total += 11
+      end
+    end
+  end
+  
+  return total
+end
+
+
 
 bankroll = bankroll_calc(bankroll, bet,new_player)
 shuffle_decks(deck)
 
-puts "Place your bet."
-bet = 100 #gets.chomp.to_i
+puts "#{player_name}, place your bet."
+until bet > 0 && bet <= bankroll do bet = 100 #gets.chomp.to_i 
+end
 
 bankroll = place_bet(bankroll, bet)
 
@@ -65,6 +104,11 @@ puts deck.count
 
 show_table(bankroll, bet, dealer_cards,player_cards, player_name)
 
+player_total = hand_eval(player_cards, player_total)
+dealer_total = hand_eval(dealer_cards, dealer_total)
+
+p player_total
+p dealer_total
 
 
 
