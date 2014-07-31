@@ -1,9 +1,12 @@
 #Variables:
-player_name = "BossMan"
+puts "Welcome to Casino Royale Black Jack.  Tell us your name, \nand let's hope you see some aces."
+player_name = gets.chomp  #"BossMan"
 player_total = 0
 player_cards = []
+player_move = ""
 dealer_cards = []
 dealer_total = 0
+dealer_move = ""
 new_player = 1
 bankroll = 0
 bet = 0
@@ -43,10 +46,11 @@ def deal_cards(player_cards, dealer_cards, deck)
 end
 
 def show_table(bankroll, bet, dealer_cards,player_cards, player_name)
+  system "clear"
   puts "Bankroll = #{bankroll}  Bet = #{bet}"
   if dealer_cards.count > 2
     puts "\n\n\n Dealer: \n #{dealer_cards}"
-  else 
+  else
     puts "\n\n\n Dealer: \n [XXXXXXX, #{dealer_cards[1]}]"
   end
   puts "\n\n\n #{player_name}: \n #{player_cards}"
@@ -54,21 +58,21 @@ end
 
 def hand_eval(cards, total)
   ace_count = 0
-  
+
   #iterate through cards to check for face cards and calculate total
-  cards.each do |c| 
+  cards.each do |c|
     if c.partition('-').first.to_i > 0
-      total += c.partition('-').first.to_i if c != 'A' 
+      total += c.partition('-').first.to_i if c != 'A'
     else
       if c.partition('-').first == 'A'
         #checking for aces to evaluate after all other cards totaled b/c they can be 1 or 11
-        ace_count += 1   
+        ace_count += 1
       else
         total += 10
       end
     end
   end
-  
+
   #ace handling
   if total > 10
     total += ace_count
@@ -81,18 +85,27 @@ def hand_eval(cards, total)
       end
     end
   end
-  
+
   return total
 end
 
+def player_options(player_cards, player_move, deck)
+  case player_move
+  when "H" #hit
+    player_cards << deck.shift
+  when "S" #stand
+
+  when "D" #double down
+    player_cards << deck.shift
+  end
+end
 
 
 bankroll = bankroll_calc(bankroll, bet,new_player)
 shuffle_decks(deck)
 
-puts "#{player_name}, place your bet."
-until bet > 0 && bet <= bankroll do bet = 100 #gets.chomp.to_i 
-end
+puts "#{player_name}, you have $#{bankroll}. Place your bet."
+until bet > 0 && bet <= bankroll do bet = gets.chomp.to_i end
 
 bankroll = place_bet(bankroll, bet)
 
@@ -107,8 +120,38 @@ show_table(bankroll, bet, dealer_cards,player_cards, player_name)
 player_total = hand_eval(player_cards, player_total)
 dealer_total = hand_eval(dealer_cards, dealer_total)
 
-p player_total
-p dealer_total
+catch :bust do
+  while ["D","S"].include?(player_move) == false do #player loop
+
+    if bankroll > (2 * bet)
+      puts "Hit (H), Stand (S), or Double Down (D)?"
+      play_array = ["H","S","D"]
+    else
+      puts "Hit (H) or Stand (S)?"
+      play_array = ["H","S"]
+    end
+
+    until play_array.include?(player_move) == true do player_move = gets.chomp.upcase end
+
+    player_options(player_cards, player_move, deck)
+
+    case player_move
+    when "D"
+      bet *= 2
+    when "H"
+      player_move = ""
+    end
+    player_total = hand_eval(player_cards, player_total)
+
+    show_table(bankroll, bet, dealer_cards,player_cards, player_name)
+
+    if player_total > 21
+      puts "#{player_name}, you busted!"
+      throw :bust
+    end
+  end #player loop
+end #catch bust
+
 
 
 
