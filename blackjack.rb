@@ -32,7 +32,8 @@ end
 
 
 def shuffle_decks(deck)
-  suits = ["spades","clubs","diamonds", "hearts"]
+
+  suits = ['♦','♣','♠', '♥']
   cards = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
 
   #combine suits and cards 4 times to create 4 decks
@@ -83,7 +84,7 @@ def hand_eval(cards)
     total += ace_count
   else
     ace_count.times do
-      if total > 10
+      if total > 10 or total + ace_count > 10
         total += ace_count
       else
         total += 11
@@ -200,6 +201,8 @@ while play_again == "Y" do
 
   end # catch end_hand
   if blackjack_indicator == 1
+    dealer_hide = 0
+    show_table(bankroll, bet, dealer_cards,player_cards, player_name, dealer_hide)
     if dealer_total == 21 && player_total == 21
       puts "It's a double blackjack! Impressive, but still a push."
     elsif dealer_total == 21
